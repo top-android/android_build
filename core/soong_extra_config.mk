@@ -85,7 +85,12 @@ $(call add_json_str, VendorImageFileSystemType, $(BOARD_VENDORIMAGE_FILE_SYSTEM_
 
 $(call add_json_list, BuildVersionTags, $(BUILD_VERSION_TAGS))
 
-$(call add_json_bool, ProductNotDebuggableInUserdebug, $(PRODUCT_NOT_DEBUGGABLE_IN_USERDEBUG))
+# [cannon][A17] add_json_bool 的语义是「非空即 true」（build/make/common/json.mk:25
+#   add_json_bool = $(call add_json_val,$(1),$(if $(strip $(2)),true,false))），
+# 所以 `PRODUCT_NOT_DEBUGGABLE_IN_USERDEBUG := false` 会被写成 JSON 的 **true**，
+# gen_build_prop.py:376 据此把 ro.debuggable 写成 0 —— userdebug 也就没有 adb root。
+# 改成只认字面 true，其余（false / 空）一律算 false。
+$(call add_json_bool, ProductNotDebuggableInUserdebug, $(filter true,$(PRODUCT_NOT_DEBUGGABLE_IN_USERDEBUG)))
 
 $(call add_json_bool, UsesProductImage, $(filter true,$(BOARD_USES_PRODUCTIMAGE)))
 
