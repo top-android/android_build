@@ -4219,6 +4219,7 @@ define build-vendorimage-target
   @mkdir -p $(TARGET_OUT_VENDOR)
   @mkdir -p $(vendorimage_intermediates) && rm -rf $(vendorimage_intermediates)/vendor_image_info.txt
   $(call generate-image-prop-dictionary, $(vendorimage_intermediates)/vendor_image_info.txt,vendor,skip_fsck=true)
+  $(if $(BOARD_CANNON_VENDOR_PREASSEMBLE),$(hide) OUT_DIR=$(OUT_DIR) PRODUCT_OUT=$(PRODUCT_OUT) $(BOARD_CANNON_VENDOR_PREASSEMBLE) $(vendorimage_intermediates)/file_list.txt || { echo "ERROR: cannon vendor preassemble failed"; exit 1; })
   PATH=$(INTERNAL_USERIMAGES_BINARY_PATHS):$$PATH \
       $(BUILD_IMAGE) \
           $(if $(BUILD_BROKEN_INCORRECT_PARTITION_IMAGES),,--input-directory-filter-file $(vendorimage_intermediates)/file_list.txt) \
